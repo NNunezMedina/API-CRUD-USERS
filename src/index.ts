@@ -1,5 +1,6 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
-import { getUsers, getUserById, createUser } from './models/userModel';
+import { getUsers, getUserById, createUser, deleteUser } from './models/userModel'; 
+import { parse } from 'querystring';
 
 const port = 3000;
 
@@ -62,6 +63,23 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         res.end(JSON.stringify({ error: 'Failed to create user' }));
       }
     });
+  } else if (method === 'DELETE' && url?.startsWith('/users/')) {
+    const id = parseInt(url.split('/')[2], 10);
+    try {
+      const result = await deleteUser(id);
+      console.log('Delete Result:', result); // Agrega esto para verificar el resultado
+      if (result) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'User deleted successfully' }));
+      } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'User not found' }));
+      }
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Failed to delete user' }));
+    }
   } else {
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ message: 'Route not found' }));

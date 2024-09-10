@@ -25,4 +25,10 @@ export const createUser = async (name: string, email: string, role: string, rate
     const result = await pool.query(query, values);
     return result.rows[0];
   };
-  
+
+  export const deleteUser = async (id: number) => {
+    const query = 'DELETE FROM users WHERE id = $1 RETURNING *';
+    const values = [id];
+    const result = await pool.query(query, values);
+    return result; 
+  };
